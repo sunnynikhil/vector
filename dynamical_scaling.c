@@ -18,7 +18,7 @@ vector* createVector(int totalSize)
 
 void resize(vector *vec)
 {
-    vec->arr=(int*)realloc(vec->arr,sizeof(int)*(vec->curLen+1));
+    vec->arr=(int*)realloc(vec->arr,sizeof(int)*(vec->totalSize)*2);
     return;
 }
 void insert(vector *vec,void *key,size_t size)
@@ -36,7 +36,7 @@ void display(vector *vec,void (*vp)(void*))
     int index;
     for(index=0; index<vec->curLen; index++)
     {
-       (*vp)(vec->arr[index]);
+        (*vp)(vec->arr[index]);
     }
 }
 void display_n(void *n)
@@ -44,13 +44,14 @@ void display_n(void *n)
     printf("      %d  ",*(int *)n);
 }
 
-void delete(vector *vec,void *key,size_t size)
+void delete(vector *vec,void *key,int (*vp)(void*,void*))
 {
-    int index,found=0,pos;
+    int index,found=0,pos,foo=0;
+
     for(index=0; index<vec->curLen; index++)
     {
-
-        if(convert(vec->arr[index],size)==convert(key,size))
+        foo=(*vp)(vec->arr[index],key);
+        if(foo==1)
         {
 
             found=1;
@@ -71,51 +72,46 @@ void delete(vector *vec,void *key,size_t size)
         printf("\n*key is not found*\n");
     }
 }
-int convert(void *data,size_t size)
+int compareInt(void *dataAddr1,void *dataAddr2)
 {
-    if (size == 4)
+    int *d1 =(int *)dataAddr1;
+    int *d2 =(int *)dataAddr2;
+    if (*d1 == *d2 )
     {
-        int idx = *(int*)data;
-        return idx;
+        return 1;
     }
-    else
-    {
-        printf("here\n");
-        int value = *(int*)data;
-        printf("%d\n",value);
-        return value;
-    }
+    return 0;
 }
 int main()
 {
     vector * vec = createVector(10);
-   int value,value1,choice;
-   while(1)
-   {
-       printf("\n1 for insertion\n");
-       printf("\n2 for deletion\n");
-       printf("\n3 for display\n");
-       printf("\n4 for exit\n");
-       printf("\nenter the choice\n");
-       scanf("%d",&choice);
-       switch(choice)
-       {
-       case 1:
-        printf("\nenter the value to insert\n");
-        scanf("%d",&value);
-        insert(vec,&value,sizeof(int));
-        break;
-       case 2:
-        printf("\nenter the to delete\n");
-        scanf("%d",&value1);
-        delete(vec,&value1,sizeof(int));
-        break;
-       case 3:
-        display(vec,display_n);
-        break;
-       case 4:
-        exit(0);
-       }
-   }
-return 0;
+    int value,value1,choice;
+    while(1)
+    {
+        printf("\n1 for insertion\n");
+        printf("\n2 for deletion\n");
+        printf("\n3 for display\n");
+        printf("\n4 for exit\n");
+        printf("\nenter the choice\n");
+        scanf("%d",&choice);
+        switch(choice)
+        {
+        case 1:
+            printf("\nenter the value to insert\n");
+            scanf("%d",&value);
+            insert(vec,&value,sizeof(int));
+            break;
+        case 2:
+            printf("\nenter the to delete\n");
+            scanf("%d",&value1);
+            delete(vec,&value1,compareInt);
+            break;
+        case 3:
+            display(vec,display_n);
+            break;
+        case 4:
+            exit(0);
+        }
+    }
+    return 0;
 }
